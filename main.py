@@ -2,17 +2,62 @@ users = {
     "test": "test"
 }
 options = {"r":"Try again", "q": "Quit"}
+overview_options = {
+    "1": "Spela",
+    "2": "Se dina spel",
+    "3": "Spelhistorik",
+    "4": "TBD",
+    "5": "logga ut"
+}
+sportsoption = {
+    "1": "Fotboll",
+    "2": "Basketball",
+    "3": "Icehockey",
+    "4": "Handball",
+    "5": "Back"
+}
 
-# meny 1
-def menu(title, prompt, options):
+# meny
+def menu(title, prompt, options, typeofmeny):
     print(title)
     for key, action in options.items():
         print(f"    {key}) {action}")
 
-    while True: 
-        userTry = input(prompt)
-        if userTry == 'r' or userTry == 'q': 
-            return userTry
+    if typeofmeny == "inlogg":
+        while True: 
+            userTry = input(prompt)
+            if userTry == 'r' or userTry == 'q': 
+                return userTry
+
+    if typeofmeny == "overview":
+        while True:
+            userTry = input(prompt)
+            if userTry == '1': 
+                menu("Sports", "Option: ", sportoptions, "sports")
+            elif userTry == '2':
+                return "game"
+            elif userTry == '3':
+                return "game_history"
+            elif userTry == '4':
+                return None
+            elif userTry == '5':
+                return "logout"
+
+    if typeofmeny == "sports":
+         while True:
+            userTry = input(prompt)
+            if userTry == '1': 
+                return "fotboll"
+            elif userTry == '2':
+                return "basketball"
+            elif userTry == '3':
+                return "game_history"
+            elif userTry == '4':
+                return None
+            elif userTry == '5':
+                return "logout"
+
+# login
 
 def login(users):
     while True: 
@@ -29,4 +74,4 @@ def login(users):
                 break
 # meny 2
 
-print(login(users))
+menu("Övergripande vy", "Options: ", inlogg, "inlogg")
