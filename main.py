@@ -1,7 +1,11 @@
+import csv # så vi kan hantera csv filer
+from datetime import date #så vi kan konvertera till date format, som är enklare att hantera
+
 users = {
     "test": "test"
 }
 options = {"r":"Try again", "q": "Quit"}
+
 overview_options = {
     "1": "Spela",
     "2": "Se dina spel",
@@ -9,6 +13,7 @@ overview_options = {
     "4": "TBD",
     "5": "logga ut"
 }
+
 sportsoption = {
     "1": "Fotboll",
     "2": "Basketball",
@@ -16,7 +21,8 @@ sportsoption = {
     "4": "Handball",
     "5": "Back"
 }
-LOGGED_IN_USER = ""
+LOGGED_IN_USER = "" # Denna variabel håller koll på den inloggade användaren
+
 # meny
 def menu(title, options, type):
     prompt = "Option: "
@@ -163,5 +169,38 @@ def view_games(sport):
         pass
     elif sport == "handball":
       pass  
-mainloop()
-print(LOGGED_IN_USER)
+
+# mainloop()
+
+# Tar in en csv fil med spel och konverterar dessa till en lista
+# med dictionaries. Returvärdet: [{spel1}, {spel2}].
+# där dictionarien är: {"hemma": "hemmmalag", "borta": "bortalag", osv}
+def add_games(file):
+    games = []
+    finalgame = []
+    with open(file, newline='') as csvfile:
+        spamreader = csv.reader(csvfile)
+        for row in spamreader:
+            games.append(row)
+            
+    
+    for game in games:
+        if game[1] != 'borta':
+            dict_to_be_added = {
+                "hemma": game[0],
+                "borta": game[1],
+                'datum': convert_to_time(game[2]),
+                'tid':   game[3],
+                'sport': game[5]
+            }
+            finalgame.append(dict_to_be_added)
+            
+    return finalgame
+
+# konverterar tiden till datetime format
+# datetime är enklare att hantera om man vill räkna ner till något.
+def convert_to_time(time='2022,10,12'):
+    rawtime = time.split(',')
+    date_temp = date(int(rawtime[0]), int(rawtime[1]), int(rawtime[2]))
+    return date_temp
+
