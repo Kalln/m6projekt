@@ -23,6 +23,10 @@ sportsoption = {
 }
 LOGGED_IN_USER = "" # Denna variabel håller koll på den inloggade användaren
 
+# Sparar inloggade användarnamnet.      
+def set_logged_in_user(user):
+    global LOGGED_IN_USER
+    LOGGED_IN_USER = user
 # meny
 def menu(title, options, type):
     prompt = "Option: "
@@ -60,7 +64,8 @@ def menu(title, options, type):
             elif userTry == '4':
                 return None
             elif userTry == '5':
-                 return "logout"
+                set_logged_in_user(None)
+                return "inlogg"
 
     elif type == "sports":
         while True:
@@ -74,7 +79,7 @@ def menu(title, options, type):
             elif userTry == '4':
                 return None
             elif userTry == '5':
-                return "back"
+                return "overview"
 
 
 # login
@@ -90,8 +95,7 @@ def login(users):
         else: 
             userTry = menu('Invalid username or password', options, "fail_login")
             if userTry == 'q':
-                user = None
-                break
+                return None
 
 # Skapa menyn, denna funktion ser till att rätt meny visas.
 def menuinit(title, typeofmenu):
@@ -104,6 +108,9 @@ def menuinit(title, typeofmenu):
     elif typeofmenu == "sports":
         OPTIONS = sportsoption
         TYPE = "sports"
+    elif typeofmenu == "fotboll" or "basketball":
+        pass 
+        #TODO: Skriva ut varje match bereonde på sport
     
     return menu(title, OPTIONS, TYPE)
 
@@ -128,21 +135,12 @@ def mainloop():
         # den generella menyn för användanren
         elif state == "overview":
             state = menuinit("Overview", state)
-            if state == "logout": 
-                state = "inlogg" #TODO: Fråga om användaren är säker
 
         # Menyn med alla olika sporter
         #         
         elif state == "sports":
             state = menuinit("Choose sports", state)
-            if state == "fotboll":
-                state == "fotboll"
-            elif state == "basketball":
-                state = "basketball"
-            elif state == "handball":
-                state = "handball"
-            elif state == "back":
-                state = "overview"
+
 
         ######################################
         #       MENYER FÖR OLIKA SPORTER     #
@@ -156,26 +154,29 @@ def mainloop():
         elif state == "handball":
             # Skriver ut en meny med alla handbolls matcher
             pass
-            
-# Sparar inloggade användarnamnet.      
-def set_logged_in_user(user):
-    global LOGGED_IN_USER
-    LOGGED_IN_USER = user
+
 
 def view_games(sport):
-    if sport == "fotball":
-        pass
+    file = 'mockup_played1.csv'
+    all_games = create_games(file)
+
+    if sport == "fotboll":
+        fotboll_games = []
+        for game in all_games:
+            if game['sport'] == 'fotboll':
+                fotboll_games.append(f"{game['hemma']} - {game['borta']}")
+        return fotboll_games
     elif sport == "basketball":
         pass
     elif sport == "handball":
       pass  
 
-# mainloop()
+#mainloop()
 
 # Tar in en csv fil med spel och konverterar dessa till en lista
 # med dictionaries. Returvärdet: [{spel1}, {spel2}].
 # där dictionarien är: {"hemma": "hemmmalag", "borta": "bortalag", osv}
-def add_games(file):
+def create_games(file):
     games = []
     finalgame = []
     with open(file, newline='') as csvfile:
@@ -204,3 +205,7 @@ def convert_to_time(time='2022,10,12'):
     date_temp = date(int(rawtime[0]), int(rawtime[1]), int(rawtime[2]))
     return date_temp
 
+fotboll_games = view_games('fotboll')
+
+for games1 in fotboll_games:
+    print( games1)
