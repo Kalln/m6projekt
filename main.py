@@ -21,12 +21,15 @@ sportsoption = {
     "4": "Handball",
     "5": "Back"
 }
+FILE = 'matcher.csv'
 LOGGED_IN_USER = "" # Denna variabel håller koll på den inloggade användaren
+ALL_GAMES = []
 
 # Sparar inloggade användarnamnet.      
 def set_logged_in_user(user):
     global LOGGED_IN_USER
     LOGGED_IN_USER = user
+
 # meny
 def menu(title, options, type):
     prompt = "Option: "
@@ -80,6 +83,15 @@ def menu(title, options, type):
                 return None
             elif userTry == '5':
                 return "overview"
+    
+    elif type == "fotboll":
+        while True:
+            userTry = input(prompt)
+            print(options)
+            if userTry in options: 
+                print(options[userTry])
+                break
+                # här måste vi få en till meny så att användaren kan spela på den valda matchen
 
 
 # login
@@ -109,7 +121,10 @@ def menuinit(title, typeofmenu):
         OPTIONS = sportsoption
         TYPE = "sports"
     elif typeofmenu == "fotboll" or "basketball":
-        pass 
+        OPTIONS = generate_options(typeofmenu)
+        print(OPTIONS)
+        TYPE = typeofmenu
+        
         #TODO: Skriva ut varje match bereonde på sport
     
     return menu(title, OPTIONS, TYPE)
@@ -141,13 +156,12 @@ def mainloop():
         elif state == "sports":
             state = menuinit("Choose sports", state)
 
-
         ######################################
         #       MENYER FÖR OLIKA SPORTER     #
         ######################################
         elif state == "fotboll":
-            # Skriva ut en meny med alla fotbolls matcher
-            pass
+            state = menuinit('Choose game to play', state)
+
         elif state == "baskeball":
             # Skriva ut en meny med alla basket matcher
             pass
@@ -155,44 +169,54 @@ def mainloop():
             # Skriver ut en meny med alla handbolls matcher
             pass
 
+def generate_list_of_sport(chosen_sport):
+    """Funktionen väljer endast ut matcher som är i den valda sporten
 
-def view_games(sport):
-    file = 'mockup_played1.csv'
-    all_games = create_games(file)
+    Args:
+        chosen_sport (string): val av sport. T.ex. fotboll, basketball osv.
 
-    if sport == "fotboll":
-        fotboll_games = []
-        for game in all_games:
-            if game['sport'] == 'fotboll':
-                fotboll_games.append(f"{game['hemma']} - {game['borta']}")
-        return fotboll_games
-    elif sport == "basketball":
-        pass
-    elif sport == "handball":
-      pass  
+    Returns:
+        list: lista med hemmalag och bortalag.
+    """
 
-#mainloop()
+    games = ALL_GAMES
+    games_list = []
 
-# Tar in en csv fil med spel och konverterar dessa till en lista
-# med dictionaries. Returvärdet: [{spel1}, {spel2}].
-# där dictionarien är: {"hemma": "hemmmalag", "borta": "bortalag", osv}
+    for game in games:
+        if game['sport'] == chosen_sport:
+            games_list.append(f"{game['hemma']} - {game['borta']}")
+
+    return games_list
+
+
 def create_games(file):
+    """Skapar en dictionary med alla spel som finns i file
+
+    Args:
+        file: en csv fil som innehåller info om alla matcher
+
+    Returvärdet: 
+        [{spel1}, {spel2}].
+        där dictionarien t.ex. är: {"hemma": "Djurgården", "borta": "AIK", osv}
+    """
+
     games = []
     finalgame = []
     with open(file, newline='') as csvfile:
-        spamreader = csv.reader(csvfile)
-        for row in spamreader:
+        reader = csv.reader(csvfile)
+        for row in reader:
             games.append(row)
             
     
     for game in games:
-        if game[1] != 'borta':
+        if game[1] != 'hemma':
             dict_to_be_added = {
-                "hemma": game[0],
-                "borta": game[1],
-                'datum': convert_to_time(game[2]),
-                'tid':   game[3],
-                'sport': game[5]
+                'id': game[0],
+                "hemma": game[1],
+                "borta": game[2],
+                'datum': convert_to_time(game[3]),
+                'tid':   game[4],
+                'sport': game[6]
             }
             finalgame.append(dict_to_be_added)
             
@@ -205,7 +229,18 @@ def convert_to_time(time='2022,10,12'):
     date_temp = date(int(rawtime[0]), int(rawtime[1]), int(rawtime[2]))
     return date_temp
 
-fotboll_games = view_games('fotboll')
+# genererar nya val i menyn, denna är dynamisk och väljer beroende på hur många matcher som
+# finns i databasen
+def generate_options(sport):
+    sport_games = generate_list_of_sport(sport)
+    new_options = {}
 
-for games1 in fotboll_games:
-    print( games1)
+    for i in range(len(sport_games)):
+        new_options[str(i+1)] = sport_games[i]
+    
+    return new_options
+
+
+if __name__ == '__main__':
+    ALL_GAMES = create_games(FILE) 
+    mainloop()
