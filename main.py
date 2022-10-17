@@ -94,7 +94,8 @@ def menu(title, options, type):
                 # här måste vi få en till meny så att användaren kan spela på den valda matchen
 
 
-# login
+def sports_menu():
+    pass
 
 def login(users):
     while True: 
