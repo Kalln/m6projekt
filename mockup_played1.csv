@@ -1,3 +1,4 @@
-﻿id,spelat,insats,odds,utdelning
-1,1,20,2.00,40.0
-2,X,100,3.00,300.0
+﻿id,spelat,insats,odds,user
+1,1,20,2.00,test
+2,X,100,3.00,bengan
+3,2,100,2.75,kalle

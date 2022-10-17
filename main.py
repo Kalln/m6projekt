@@ -215,6 +215,40 @@ def create_games(file):
             
     return finalgame
 
+def create_bettings(file):
+    raw_bettings = []
+    final_dict_betting = []
+    with open(file, newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            raw_bettings.append(row)
+            
+    
+    for bets in raw_bettings:
+        if bets[1] != 'spelat':
+            dict_to_be_added = {
+                'MATCHID':  bets[0],
+                "SPELAT":   bets[1],
+                "INSATS":   bets[2],
+                'ODDS':     bets[3],
+                'USER':     bets[4],
+            }
+            final_dict_betting.append(dict_to_be_added)
+            
+    return final_dict_betting
+
+def view_user_bettings(bettings):
+    # TITELN
+    # SPORT 1 
+    # HEMMA - BORTA [17/10-22 15:00]
+    # INSATS: 20 ODDS: 2.00  
+    # UTDELNING: 40
+
+
+    # Skriv ut varje spel för varje sport tillsammans. 
+    pass
+
+
 # konverterar tiden till datetime format
 # datetime är enklare att hantera om man vill räkna ner till något.
 def convert_to_time(time='2022,10,12'):
@@ -236,4 +270,6 @@ def generate_options(sport):
 
 if __name__ == '__main__':
     ALL_GAMES = create_games(FILE) 
-    mainloop()
+    print(view_user_bettings(create_bettings('mockup_played1.csv')))
+    #mainloop()
+    #
