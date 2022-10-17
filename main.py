@@ -84,12 +84,12 @@ def menu(title, options, type):
             elif userTry == '5':
                 return "overview"
     
-    elif type == "fotboll":
+    elif type == "fotboll" or "basketball":
         while True:
             userTry = input(prompt)
             print(options)
             if userTry in options: 
-                print(options[userTry])
+                print(ALL_GAMES)
                 break
                 # här måste vi få en till meny så att användaren kan spela på den valda matchen
 
@@ -159,15 +159,8 @@ def mainloop():
         ######################################
         #       MENYER FÖR OLIKA SPORTER     #
         ######################################
-        elif state == "fotboll":
+        elif state == "fotboll" or 'basketball' or 'baseball':
             state = menuinit('Choose game to play', state)
-
-        elif state == "baskeball":
-            # Skriva ut en meny med alla basket matcher
-            pass
-        elif state == "handball":
-            # Skriver ut en meny med alla handbolls matcher
-            pass
 
 def generate_list_of_sport(chosen_sport):
     """Funktionen väljer endast ut matcher som är i den valda sporten
@@ -183,8 +176,8 @@ def generate_list_of_sport(chosen_sport):
     games_list = []
 
     for game in games:
-        if game['sport'] == chosen_sport:
-            games_list.append(f"{game['hemma']} - {game['borta']}")
+        if game['SPORT'] == chosen_sport:
+            games_list.append(f"{game['HOME']} - {game['AWAY']}")
 
     return games_list
 
@@ -197,7 +190,7 @@ def create_games(file):
 
     Returvärdet: 
         [{spel1}, {spel2}].
-        där dictionarien t.ex. är: {"hemma": "Djurgården", "borta": "AIK", osv}
+        där dictionarien t.ex. är: {"HOME": "Djurgården", "AWAY": "AIK", osv}
     """
 
     games = []
@@ -211,12 +204,12 @@ def create_games(file):
     for game in games:
         if game[1] != 'hemma':
             dict_to_be_added = {
-                'id': game[0],
-                "hemma": game[1],
-                "borta": game[2],
-                'datum': convert_to_time(game[3]),
-                'tid':   game[4],
-                'sport': game[6]
+                'ID': game[0],
+                "HOME": game[1],
+                "AWAY": game[2],
+                'DATE': convert_to_time(game[3]),
+                'TIME':   game[4],
+                'SPORT': game[6]
             }
             finalgame.append(dict_to_be_added)
             
