@@ -29,8 +29,8 @@ MATCH_OPTIONS = {
         "2": "TVÅ",
         "5": "Back"
     }
-FILE = 'matcher.csv'
-LOGGED_IN_USER = "" # Denna variabel håller koll på den inloggade användaren
+FILE = './data/matcher.csv'
+LOGGED_IN_USER = "test" # Denna variabel håller koll på den inloggade användaren
 ALL_GAMES = []
 
 # Sparar inloggade användarnamnet.      
@@ -125,15 +125,27 @@ def place_bet(place_bet_on, game_dict):
         insats = input("insats: ")
         try:
             (int(insats))
-            create_betting(place_bet_on, game_dict, insats)
+            create_betting(place_bet_on, game_dict, insats, odds_on_user_choice)
             return 'sports'
         except:
             print('Inte ett heltal')
 
-def create_betting(place_bet_on, game_dict, insats):
-    f = open('mockup_played1.csv', 'w')
-    writer = csv.writer(f)
-    writer.writerow(f"{game_dict['ID']}")
+def create_betting(place_bet_on, game_dict, insats, odds):
+    # bet_data: är info om spelet som placeras av användaren i följande ordning:
+    # MATCHID,(1/X/2),INSATS,ODDS,ANVÄNDARE
+    
+    bet_data = [game_dict['ID'],
+                place_bet_on,
+                insats,
+                odds,
+                LOGGED_IN_USER
+                ]
+
+    # Detta öppnar csv filen och lägger till bet_data på en ny rad.
+    with open('./data/test.csv', 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(bet_data)
+    print("bet placed")
 
 def match_menu(game_dict):
     title = f"{game_dict['HOME']} - {game_dict['AWAY']}"
@@ -320,6 +332,6 @@ def generate_options(sport):
 
 if __name__ == '__main__':
     ALL_GAMES = create_games(FILE) 
-    #print(view_user_bettings(create_bettings('mockup_played1.csv')))
-    mainloop()
-    #
+    #print(view_user_bettings(create_bettings('./data/mockup_played1.csv')))
+    #mainloop()
+    create_betting('1', ALL_GAMES[1], 26, 2.6)
