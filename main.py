@@ -1,5 +1,6 @@
 import csv # så vi kan hantera csv filer
 from datetime import date #så vi kan konvertera till date format, som är enklare att hantera
+import random
 
 users = {
     "test": "test"
@@ -21,6 +22,13 @@ sportsoption = {
     "4": "Handball",
     "5": "Back"
 }
+
+MATCH_OPTIONS = {
+        "1": "ETT",
+        "X": "KRYSS",
+        "2": "TVÅ",
+        "5": "Back"
+    }
 FILE = 'matcher.csv'
 LOGGED_IN_USER = "" # Denna variabel håller koll på den inloggade användaren
 ALL_GAMES = []
@@ -31,7 +39,7 @@ def set_logged_in_user(user):
     LOGGED_IN_USER = user
 
 # meny
-def menu(title, options, type):
+def menu(title, options, type, match=None):
     prompt = "Option: "
 
     print(f"""
@@ -84,18 +92,59 @@ def menu(title, options, type):
             elif userTry == '5':
                 return "overview"
     
-    elif type == "fotboll" or "basketball":
+    elif type == "fotboll" or type == "basketball":
         while True:
             userTry = input(prompt)
-            print(options)
             if userTry in options: 
-                print(ALL_GAMES)
-                break
+                matchID = userTry
+                for game in ALL_GAMES:
+                    if matchID == game['ID']:
+                        return match_menu(game)
                 # här måste vi få en till meny så att användaren kan spela på den valda matchen
+    elif type == "match":
+        while True:
+            userTry = input(prompt)
+            if userTry == '1': # spel på hemmalaget
+                place_bet('1', match)
+                return 'sports'
+            elif userTry == 'X': # spel på lika
+                place_bet('X', match)
+                return 'sports'
+            elif userTry == '2': #spel på bortalaget
+                place_bet('2', match)
+                return 'sports'
+            elif userTry == '5': # gå tillbaka
+                return "sports"
 
+def place_bet(place_bet_on, game_dict):
+    odds_on_user_choice = random.uniform(1.1, 3.8)
+    print(f"""
+        {game_dict['HOME']} - {game_dict['AWAY']}
+    """)
+    while True: # kolla så att den är ett heltal som användaren skriver in
+        insats = input("insats: ")
+        try:
+            (int(insats))
+            create_betting(place_bet_on, game_dict, insats)
+            return 'sports'
+        except:
+            print('Inte ett heltal')
 
-def sports_menu():
-    pass
+def create_betting(place_bet_on, game_dict, insats):
+    f = open('mockup_played1.csv', 'w')
+    writer = csv.writer(f)
+    writer.writerow(f"{game_dict['ID']}")
+
+def match_menu(game_dict):
+    title = f"{game_dict['HOME']} - {game_dict['AWAY']}"
+    MATCH_OPTIONS = {
+            "1": "ETT",
+            "X": "KRYSS",
+            "2": "TVÅ",
+            "5": "Back"
+        }
+    return menu(title, MATCH_OPTIONS, 'match', game_dict)
+
 
 def login(users):
     while True: 
@@ -123,7 +172,6 @@ def menuinit(title, typeofmenu):
         TYPE = "sports"
     elif typeofmenu == "fotboll" or "basketball":
         OPTIONS = generate_options(typeofmenu)
-        print(OPTIONS)
         TYPE = typeofmenu
         
         #TODO: Skriva ut varje match bereonde på sport
@@ -178,7 +226,7 @@ def generate_list_of_sport(chosen_sport):
 
     for game in games:
         if game['SPORT'] == chosen_sport:
-            games_list.append(f"{game['HOME']} - {game['AWAY']}")
+            games_list.append(game)
 
     return games_list
 
@@ -263,14 +311,15 @@ def generate_options(sport):
     sport_games = generate_list_of_sport(sport)
     new_options = {}
 
-    for i in range(len(sport_games)):
-        new_options[str(i+1)] = sport_games[i]
+    for game in sport_games:
+        
+        new_options[game['ID']] = f"{game['HOME']} - {game['AWAY']}"
     
     return new_options
 
 
 if __name__ == '__main__':
     ALL_GAMES = create_games(FILE) 
-    print(view_user_bettings(create_bettings('mockup_played1.csv')))
-    #mainloop()
+    #print(view_user_bettings(create_bettings('mockup_played1.csv')))
+    mainloop()
     #
