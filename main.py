@@ -1,9 +1,12 @@
 import csv # så vi kan hantera csv filer
-from datetime import date #så vi kan konvertera till date format, som är enklare att hantera
+from datetime import date
+from math import radians #så vi kan konvertera till date format, som är enklare att hantera
 import random
 
 users = {
-    "test": "test"
+    "test": "test",
+    "bengt": "bengt",
+    "johan": "johan"
 }
 
 # Olika options för användaren att välja mellan.
@@ -115,7 +118,7 @@ def menu(title, options, type, match=None):
             if userTry == '1': # spel på hemmalaget
                 place_bet('1', match)
                 return 'sports'
-            elif userTry == 'X': # spel på lika
+            elif userTry == 'x': # spel på lika
                 place_bet('X', match)
                 return 'sports'
             elif userTry == '2': #spel på bortalaget
@@ -129,9 +132,10 @@ def place_bet(place_bet_on, game_dict):
     En meny där användaren får ge sin insats. Vi kontrollerar att det vad användaren har skrivit in är en integer. annars frågar vi om igen.
 
     """
-    odds_on_user_choice = random.uniform(1.1, 3.8)
+    odds_on_user_choice = get_odds_on_bet(place_bet_on, game_dict)
     print(f"""
         {game_dict['HOME']} - {game_dict['AWAY']}
+        ODDS: {odds_on_user_choice}
     """)
     while True: # kolla så att den är ett heltal som användaren skriver in
         insats = input("insats: ")
@@ -141,6 +145,15 @@ def place_bet(place_bet_on, game_dict):
             return 'sports'
         except:
             print('Inte ett heltal')
+
+def get_odds_on_bet(bet_choice, game_dict):
+    if bet_choice == "1":
+        return game_dict['HOMEODDS']
+    elif bet_choice == 'X':
+        return game_dict['TIEODDS']
+    elif bet_choice == '2':
+        return game_dict['AWAYODDS']
+
 
 def save_bet(place_bet_on, game_dict, insats, odds):
     """ Sparar bettet till en databas.
@@ -177,11 +190,15 @@ def match_menu(game_dict):
     Argument: 
     game_dict(dictionary): detta är matchen (dictionary) som användaren har valt att spela på.
     """
-    title = f"{game_dict['HOME']} - {game_dict['AWAY']}" # titeln består av "hemmalag-bortalag"
+    title = f"""
+    {game_dict['HOME']}     -     {game_dict['AWAY']}
+    HOME:  {game_dict['HOMEODDS']} TIE: {game_dict['TIEODDS']} AWAY: {game_dict['AWAYODDS']}
+
+    """ # titeln består av "hemmalag-bortalag" och odds
     match_options = {
-            "1": "ETT",
-            "X": "KRYSS",
-            "2": "TVÅ",
+            "1": "Hemmalaget vinner",
+            "x": "Lika",
+            "2": "Bortalaget vinner",
             "5": "Back"
         }
     return menu(title, match_options, 'match', game_dict)
@@ -304,13 +321,19 @@ def create_games(file):
     
     for game in games:
         if game[1] != 'hemma':
+            homeodds = "%.2f" % random.uniform(1.8, 4.5)
+            tieodds = "%.2f" % random.uniform(1.8, 4.5)
+            awayodds = "%.2f" % random.uniform(1.8, 4.5)
             dict_to_be_added = {
                 'ID': game[0],
                 "HOME": game[1],
                 "AWAY": game[2],
                 'DATE': convert_to_time(game[3]),
                 'TIME':   game[4],
-                'SPORT': game[6]
+                'SPORT': game[6],
+                'HOMEODDS': homeodds,
+                'TIEODDS':  tieodds,
+                'AWAYODDS': awayodds
             }
             finalgame.append(dict_to_be_added)
             
@@ -335,7 +358,7 @@ def create_bettings(file):
                 "SPELAT":   bets[1],
                 "INSATS":   bets[2],
                 'ODDS':     bets[3],
-                'USER':     bets[4],
+                'USER':     bets[4]
             }
             final_dict_betting.append(dict_to_be_added)
             
@@ -389,5 +412,5 @@ def generate_options(sport):
 if __name__ == '__main__':
     ALL_GAMES = create_games(FILE) 
     #print(view_user_bettings(create_bettings('./data/mockup_played1.csv')))
-    #mainloop()
-    create_betting('1', ALL_GAMES[1], 26, 2.6)
+    mainloop()
+    #create_betting('1', ALL_GAMES[1], 26, 2.6)
