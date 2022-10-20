@@ -5,6 +5,8 @@ import random
 users = {
     "test": "test"
 }
+
+# Olika options för användaren att välja mellan.
 options = {"r":"Try again", "q": "Quit"}
 
 overview_options = {
@@ -14,22 +16,20 @@ overview_options = {
     "4": "TBD",
     "5": "logga ut"
 }
-
-sportsoption = {
+sports_option = {
     "1": "Fotboll",
     "2": "Basketball",
     "3": "Icehockey",
     "4": "Handball",
     "5": "Back"
 }
-
-MATCH_OPTIONS = {
+match_options = {
         "1": "ETT",
         "X": "KRYSS",
         "2": "TVÅ",
         "5": "Back"
     }
-FILE = './data/matcher.csv'
+FILE = './data/matcher.csv' # Databasen av alla matcher.
 LOGGED_IN_USER = "test" # Denna variabel håller koll på den inloggade användaren
 ALL_GAMES = []
 
@@ -40,17 +40,25 @@ def set_logged_in_user(user):
 
 # meny
 def menu(title, options, type, match=None):
-    prompt = "Option: "
+    prompt = "Option: " # Användarens fråga när vi ska få in något värde
 
+    # Följande skriver ut titeln samt alternativen som användaren har att välja mellan.
     print(f"""
     {title}
     """)
 
-    # Print menu
     for key, action in options.items():
         print(f"    {key}) {action}")
 
-    # Bereoende på vilken meny som visas, kontrollerar vi rätt input från användaren.
+    """
+    Bereoende på vilken meny som visas, kontrollerar vi rätt input från användaren.
+    type = 'inlogg'                         -> "inlogg" skärmen visas där användaren loggar in
+    type = 'fail_login'                     -> om användaren har misslyckats att logga in
+    type = 'overview'                       -> Huvudmenyn där användaren kan navigera till olika alternativ, antingen att spela, visa sina spel, eller gå ur.
+    type = 'sports'                         -> Menyn som visar alla tillgängliga sporter.
+    type = 'fotboll' eller 'basketball' osv -> Menyn för den specifika sporten som valts i "sports"
+    type = 'match'                          -> Menyn för den specifika valda matchen visas där användaren kan välja att spela antingen 1/x/2.
+    """ 
     if type == "inlogg":
         userToLogin = login(users)
         if userToLogin != None:
@@ -117,6 +125,10 @@ def menu(title, options, type, match=None):
                 return "sports"
 
 def place_bet(place_bet_on, game_dict):
+    """
+    En meny där användaren får ge sin insats. Vi kontrollerar att det vad användaren har skrivit in är en integer. annars frågar vi om igen.
+
+    """
     odds_on_user_choice = random.uniform(1.1, 3.8)
     print(f"""
         {game_dict['HOME']} - {game_dict['AWAY']}
@@ -125,14 +137,24 @@ def place_bet(place_bet_on, game_dict):
         insats = input("insats: ")
         try:
             (int(insats))
-            create_betting(place_bet_on, game_dict, insats, odds_on_user_choice)
+            save_bet(place_bet_on, game_dict, insats, odds_on_user_choice)
             return 'sports'
         except:
             print('Inte ett heltal')
 
-def create_betting(place_bet_on, game_dict, insats, odds):
-    # bet_data: är info om spelet som placeras av användaren i följande ordning:
-    # MATCHID,(1/X/2),INSATS,ODDS,ANVÄNDARE
+def save_bet(place_bet_on, game_dict, insats, odds):
+    """ Sparar bettet till en databas.
+    
+    Argument: 
+    place_bet_on(string): antingen 1/x/2 beroende på vad användaren har valt att spela på.
+    game_dict(dictionary): matchen som användaren vill spela på
+    insats(int): insatsen för spelet
+    odds(float): oddset för det spelet
+
+    bet_data: är info om spelet som placeras av användaren i följande ordning:
+    MATCHID,(1/X/2),INSATS,ODDS,ANVÄNDARE
+    """
+    
     
     bet_data = [game_dict['ID'],
                 place_bet_on,
@@ -148,14 +170,21 @@ def create_betting(place_bet_on, game_dict, insats, odds):
     print("bet placed")
 
 def match_menu(game_dict):
-    title = f"{game_dict['HOME']} - {game_dict['AWAY']}"
-    MATCH_OPTIONS = {
+    """
+    När en match har blivit vald så ropas denna funktion. Den ser till att den valda matchen visar nya alternativ och skapar
+    en ny meny där användaren sedan kan välja antingen 1/x/2 spel.
+
+    Argument: 
+    game_dict(dictionary): detta är matchen (dictionary) som användaren har valt att spela på.
+    """
+    title = f"{game_dict['HOME']} - {game_dict['AWAY']}" # titeln består av "hemmalag-bortalag"
+    match_options = {
             "1": "ETT",
             "X": "KRYSS",
             "2": "TVÅ",
             "5": "Back"
         }
-    return menu(title, MATCH_OPTIONS, 'match', game_dict)
+    return menu(title, match_options, 'match', game_dict)
 
 
 def login(users):
@@ -173,32 +202,45 @@ def login(users):
 
 # Skapa menyn, denna funktion ser till att rätt meny visas.
 def menuinit(title, typeofmenu):
+    """Ser till att funktionen menu() visar rätt alternativ.
+
+    Argument: 
+    title(string):      Är titeln på alternativen som visas till användaren
+    typeofmenu(string): Variabeln ser till att rätt meny visas.
+
+    Returvärde: 
+    state(string):  returnernar state alltså, "overview","sports","fotboll"..osv. som avgör vilken meny användaren vill navigera till.
+                    Detta värde får vi från menu() funktionen
+    """
+    TYPE = typeofmenu
     if typeofmenu == "inlogg":
         OPTIONS = options
-        TYPE = "inlogg"
+
     elif typeofmenu == "overview":
         OPTIONS = overview_options
-        TYPE = "overview"
+
     elif typeofmenu == "sports":
-        OPTIONS = sportsoption
-        TYPE = "sports"
-    elif typeofmenu == "fotboll" or "basketball":
-        OPTIONS = generate_options(typeofmenu)
-        TYPE = typeofmenu
+        OPTIONS = sports_option
+
+    elif typeofmenu == "fotboll" or typeofmenu == "basketball":
+        OPTIONS = generate_options(typeofmenu) # generate_options genererar användarens valmöjligheter. 
         
         #TODO: Skriva ut varje match bereonde på sport
     
     return menu(title, OPTIONS, TYPE)
 
 def mainloop():
+    """
+        Variabeln state avgör vilken meny som användaren
+        varje meny har en egen if-sats som skapar en meny bereonde på var i programmet användaren är.
+    """
 
-    # variabeln state avgör vilken meny som användaren är på
-    # varje "meny" har en egen if-sats och i dessa if satser finns
-    # det fler if-satser som gör det som ska göras bereonde på användarens input.
-    state = "inlogg"
+    state = "inlogg" # första gången visas "inlogg"-skärmen
     while True: 
 
-        # logga in skärmen
+        # 'INLOGG'-skärmen
+        # börjar med att ropa på login funktionen, där users är en dictionary med användarnamn och lösenord.
+        # login returnerar användarnamnet och vi ger den globala variabeln "LOGGED_IN_USER" på rad 33. 
         if state == "inlogg":
             logged_in_user = login(users)
             if logged_in_user != None:
@@ -208,19 +250,17 @@ def mainloop():
                 print(LOGGED_IN_USER)
                 break
         
-        # den generella menyn för användanren
+        # den generella menyn för användaren
         elif state == "overview":
             state = menuinit("Overview", state)
 
-        # Menyn med alla olika sporter
-        #         
+        # Menyn med alla olika sporter       
         elif state == "sports":
             state = menuinit("Choose sports", state)
 
-        ######################################
-        #       MENYER FÖR OLIKA SPORTER     #
-        ######################################
-        elif state == "fotboll" or 'basketball' or 'baseball':
+        
+        # MENYER FÖR OLIKA SPORTER
+        elif state == "fotboll" or state == 'basketball' or state == 'baseball':
             state = menuinit('Choose game to play', state)
 
 def generate_list_of_sport(chosen_sport):
@@ -277,6 +317,9 @@ def create_games(file):
     return finalgame
 
 def create_bettings(file):
+    """
+    Mer dokumentation
+    """
     raw_bettings = []
     final_dict_betting = []
     with open(file, newline='') as csvfile:
@@ -310,16 +353,29 @@ def view_user_bettings(bettings):
     pass
 
 
-# konverterar tiden till datetime format
-# datetime är enklare att hantera om man vill räkna ner till något.
 def convert_to_time(time='2022,10,12'):
+    """
+    Konverterar till datetime format. 
+
+    Argument:
+    time(str): Innehåller värden av datum i formattet 'YYYY,MM,DD'.
+
+    Returvärdet:
+    datetime (ett datum)
+    """
     rawtime = time.split(',')
     date_temp = date(int(rawtime[0]), int(rawtime[1]), int(rawtime[2]))
     return date_temp
 
-# genererar nya val i menyn, denna är dynamisk och väljer beroende på hur många matcher som
-# finns i databasen
 def generate_options(sport):
+    """Genererar nya val i menyn när användaren ska välja match att spela på.
+
+    Args:
+        sport (str): en sport som avgör vilka matcher i en valbar lista.
+
+    Returns:
+        dictionary: en dictionary med val alternativ som nyckel och hemma och borta laget som värde.
+    """
     sport_games = generate_list_of_sport(sport)
     new_options = {}
 
