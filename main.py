@@ -1,6 +1,5 @@
 import csv # så vi kan hantera csv filer
-from datetime import date
-from math import radians #så vi kan konvertera till date format, som är enklare att hantera
+from datetime import date #så vi kan konvertera till date format, som är enklare att hantera
 import random
 
 users = {
@@ -371,8 +370,12 @@ def view_user_bettings(bettings):
     # INSATS: 20 ODDS: 2.00  
     # UTDELNING: 40
 
-
+    # variabelen games: innehåller alla spel
+    games = ALL_GAMES
+    
+    # argumentet bettings har alla bets
     # Skriv ut varje spel för varje sport tillsammans. 
+
     pass
 
 
@@ -411,6 +414,6 @@ def generate_options(sport):
 
 if __name__ == '__main__':
     ALL_GAMES = create_games(FILE) 
-    #print(view_user_bettings(create_bettings('./data/mockup_played1.csv')))
-    mainloop()
+    print(view_user_bettings(create_bettings('./data/mockup_played1.csv')))
+    #mainloop()
     #create_betting('1', ALL_GAMES[1], 26, 2.6)
