@@ -79,7 +79,8 @@ def menu(title, options, type, match=None):
             if userTry == '1': 
                 return "sports"
             elif userTry == '2':
-                return "game"
+                view_user_bettings(create_bettings('./data/mockup_played1.csv'))
+                return "overview"
             elif userTry == '3':
                 return "game_history"
             elif userTry == '4':
@@ -372,6 +373,20 @@ def view_user_bettings(bettings):
 
     # variabelen games: innehåller alla spel
     games = ALL_GAMES
+    print("DINA SPEL")
+    for bets in bettings:
+        gameid = bets['MATCHID']
+        for game in games:
+            if(game['ID'] == gameid):
+                if(bets['USER'] == LOGGED_IN_USER):
+                    print(f"""
+                        {game['HOME']} - {game['AWAY']} [{game['DATE']} {game['TIME']}]
+                        Spelat: {bets['SPELAT']}
+                        Insats: {bets['INSATS']} ODDS: {bets['ODDS']}
+                        Utdelning: {int(bets['INSATS'])*float(bets['ODDS'])}
+                    """)
+
+
     
     # argumentet bettings har alla bets
     # Skriv ut varje spel för varje sport tillsammans. 
@@ -407,7 +422,7 @@ def generate_options(sport):
 
     for game in sport_games:
         
-        new_options[game['ID']] = f"{game['HOME']} - {game['AWAY']}"
+        new_options[game['ID']] = f"{game['HOME']} - {game['AWAY']} --> [Datum: {game['DATE']} | Tid: {game['TIME']}]"
     
     return new_options
 
