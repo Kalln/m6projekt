@@ -414,6 +414,6 @@ def generate_options(sport):
 
 if __name__ == '__main__':
     ALL_GAMES = create_games(FILE) 
-    print(view_user_bettings(create_bettings('./data/mockup_played1.csv')))
-    #mainloop()
+    #print(view_user_bettings(create_bettings('./data/mockup_played1.csv')))
+    mainloop()
     #create_betting('1', ALL_GAMES[1], 26, 2.6)
