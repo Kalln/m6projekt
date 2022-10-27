@@ -82,7 +82,8 @@ def menu(title, options, type, match=None):
                 view_user_bettings(create_bettings('./data/mockup_played1.csv'))
                 return "overview"
             elif userTry == '3':
-                return "game_history"
+                print("INTE IMPLEMENTERAD")
+                return "overview"
             elif userTry == '4':
                 return None
             elif userTry == '5':
